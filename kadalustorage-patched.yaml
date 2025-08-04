@@ -1,0 +1,25 @@
+apiVersion: kadalu-operator.storage/v1alpha1
+kind: KadaluStorage
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"kadalu-operator.storage/v1alpha1","kind":"KadaluStorage","metadata":{"annotations":{},"name":"gluster-storage","namespace":"kadalu"},"spec":{"details":{"gluster_hosts":["master01.gluster.local"],"gluster_options":"","gluster_volname":"gv0"},"storage":[],"type":"External"}}
+  creationTimestamp: "2025-08-04T13:01:31Z"
+  generation: 2
+  name: gluster-storage
+  namespace: kadalu
+  resourceVersion: "1792172"
+  uid: 02fe138f-b7ab-4365-bafa-89c5b7ebdb7e
+spec:
+  details:
+    gluster_hosts:
+    - master01.gluster.local
+    - node01.gluster.local
+    - node02.gluster.local
+    - node03.gluster.local
+    gluster_options: ""
+    gluster_volname: gv0
+  pvReclaimPolicy: retain
+  single_pv_per_pool: false
+  storage: []
+  type: External

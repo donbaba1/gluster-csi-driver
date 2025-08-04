@@ -1,0 +1,12 @@
+# In glusterfs-sc.yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: glusterfs-csi-default
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+provisioner: csi.gluster.org
+reclaimPolicy: Retain
+parameters:
+  glusterServers: "master01.gluster.local,node01.gluster.local,node02.gluster.local,node03.gluster.local"
+  volumetype: "replicate:2" # We will use a replicate:2 volume type for new volumes

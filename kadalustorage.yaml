@@ -1,0 +1,15 @@
+apiVersion: kadalu-operator.storage/v1alpha1
+kind: Kadalustorage
+metadata:
+  name: my-storage-pool
+spec:
+  nodeStorage:
+    volumes:
+    - path: /mnt/glusterfs
+      node: master01
+    - path: /mnt/glusterfs
+      node: node01
+    - path: /mnt/glusterfs
+      node: node02
+    - path: /mnt/glusterfs
+      node: node03

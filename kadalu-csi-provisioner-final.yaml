@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kadalu-csi-provisioner
+  namespace: kadalu
+spec:
+  serviceName: "kadalu-csi-provisioner"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kadalu-csi-provisioner
+  template:
+    metadata:
+      labels:
+        app: kadalu-csi-provisioner
+    spec:
+      serviceAccount: kadalu-csi-provisioner
+      hostAliases:
+      - ip: "10.10.129.15"
+        hostnames:
+        - "master01.gluster.local"
+      - ip: "10.10.129.16"
+        hostnames:
+        - "node01.gluster.local"
+      - ip: "10.10.129.17"
+        hostnames:
+        - "node02.gluster.local"
+      - ip: "10.10.129.18"
+        hostnames:
+        - "node03.gluster.local"
+      containers:
+      - name: csi-provisioner
+        image: registry.k8s.io/sig-storage/csi-provisioner:v2.0.2
+        args:
+        - --csi-address=$(ADDRESS)
+        - --feature-gates=Topology=false
+        - --v=5
+        env:
+        - name: ADDRESS
+          value: /var/lib/csi/sockets/pluginproxy/csi.sock
+        volumeMounts:
+        - name: socket-dir
+          mountPath: /var/lib/csi/sockets/pluginproxy/
+      - name: kadalu-provisioner
+        securityContext:
+          privileged: true
+        image: kadalu/csi-provisioner:v1.3.0 
+        args:
+        - start
+        - --csi-socket
+        - /var/lib/csi/sockets/pluginproxy/csi.sock
+        - --volname-suffix
+        - "-pvc-"
+        - --gluster-volumes
+        - "master01.gluster.local:gv0"
+        - --provisioner
+        volumeMounts:
+        - name: socket-dir
+          mountPath: /var/lib/csi/sockets/pluginproxy/
+        - name: kadalu-csi-vol-dir
+          mountPath: /var/lib/kadalu/csi
+        - name: run-gluster-socket
+          mountPath: /run/gluster/
+        env:
+        - name: KADALU_CSI_PROVISIONER_NAME
+          value: kadalu-csi-provisioner
+      volumes:
+      - name: socket-dir
+        emptyDir: {}
+      - name: kadalu-csi-vol-dir
+        hostPath:
+          path: /var/lib/kadalu/csi
+          type: DirectoryOrCreate
+      - name: run-gluster-socket
+        hostPath:
+          path: /run/gluster
+          type: DirectoryOrCreate
